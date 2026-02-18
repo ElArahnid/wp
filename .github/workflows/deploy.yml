@@ -1,0 +1,22 @@
+# name: Deploy
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       # Setup key
+#       - run: set -eu
+#       - run: mkdir "$HOME/.ssh"
+#       - run: echo "${{ secrets.GITHUB_TOKEN }}" > "$HOME/.ssh/WP_SECRET"
+#       - run: chmod 600 "$HOME/.ssh/WP_SECRET"
+#       # Build
+#       # - run: npm ci
+#       # - run: npm run build
+#       # Deploy
+#       - run: cd app && rsync -e "ssh -p 20022 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
