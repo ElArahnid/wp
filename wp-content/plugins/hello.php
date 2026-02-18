@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function hello_dolly_get_lyric() {
 	/** These are the lyrics to Hello Dolly */
-	$lyrics = "---Hello, Dolly
+	$lyrics = "------------------Hello, Dolly
 Well, hello, Dolly
 It's so nice to have you back where you belong
 You're lookin' swell, Dolly
