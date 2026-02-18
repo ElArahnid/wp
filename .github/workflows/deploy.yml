@@ -9,56 +9,41 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3  # лучше использовать v3
+      - uses: actions/checkout@v3
       
-      # Setup key с диагностикой
       - name: Setup SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           set -eu
           mkdir -p "$HOME/.ssh"
           
-          # Сохраняем ключ
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/WP_SECRET"
-          chmod 600 "$HOME/.ssh/WP_SECRET"
+          # Сохраняем ключ, удаляя возможные лишние символы
+          echo "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_rsa"
+          chmod 600 "$HOME/.ssh/id_rsa"
           
-          # ДИАГНОСТИКА
-          echo "=== ДИАГНОСТИКА КЛЮЧА ==="
-          echo "1. Размер файла:"
-          wc -c "$HOME/.ssh/WP_SECRET"
+          # Проверяем ключ
+          echo "Ключ сохранен. Проверка формата:"
+          head -n 1 "$HOME/.ssh/id_rsa"
           
-          echo "2. Первая строка ключа:"
-          head -n 1 "$HOME/.ssh/WP_SECRET"
-          
-          echo "3. Последняя строка ключа:"
-          tail -n 1 "$HOME/.ssh/WP_SECRET"
-          
-          echo "4. Количество строк:"
-          wc -l "$HOME/.ssh/WP_SECRET"
-          
-          echo "5. Проверка валидности ключа:"
-          if ssh-keygen -l -f "$HOME/.ssh/WP_SECRET" &>/dev/null; then
-            echo "✅ Ключ валидный!"
+          # Тестируем ключ
+          if ssh-keygen -y -f "$HOME/.ssh/id_rsa" &>/dev/null; then
+            echo "✅ Ключ валидный"
           else
-            echo "❌ Ключ НЕ валидный! Возможные причины:"
-            echo "   - В секрете не полный ключ (нет BEGIN/END строк)"
-            echo "   - Ключ в неправильном формате"
-            echo "   - Есть лишние пробелы или переносы"
+            echo "❌ Ключ НЕ валидный"
+            exit 1
           fi
-          echo "=========================="
       
-      # Добавляем сервер в known_hosts 
       - name: Add server to known_hosts
         run: |
           ssh-keyscan -p 22 179.43.144.107 >> "$HOME/.ssh/known_hosts"
       
-      # Deploy
-      - name: Deploy via rsync
+      - name: Deploy
         run: |
           rsync -avz --delete \
-            -e "ssh -p 22 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" \
+            -e "ssh -p 22 -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no" \
             --exclude '.git' \
             --exclude '.github' \
             --exclude 'node_modules' \
-            --exclude '.env' \
             ./ \
             adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru/
