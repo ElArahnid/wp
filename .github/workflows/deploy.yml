@@ -9,15 +9,56 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      # Setup key
-      - run: set -eu
-      - run: mkdir "$HOME/.ssh"
-      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/WP_SECRET"
-      - run: chmod 600 "$HOME/.ssh/WP_SECRET"
+      - uses: actions/checkout@v3  # лучше использовать v3
       
-      # Build
-      # - run: npm ci
-      # - run: npm run build
+      # Setup key с диагностикой
+      - name: Setup SSH key
+        run: |
+          set -eu
+          mkdir -p "$HOME/.ssh"
+          
+          # Сохраняем ключ
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/WP_SECRET"
+          chmod 600 "$HOME/.ssh/WP_SECRET"
+          
+          # ДИАГНОСТИКА
+          echo "=== ДИАГНОСТИКА КЛЮЧА ==="
+          echo "1. Размер файла:"
+          wc -c "$HOME/.ssh/WP_SECRET"
+          
+          echo "2. Первая строка ключа:"
+          head -n 1 "$HOME/.ssh/WP_SECRET"
+          
+          echo "3. Последняя строка ключа:"
+          tail -n 1 "$HOME/.ssh/WP_SECRET"
+          
+          echo "4. Количество строк:"
+          wc -l "$HOME/.ssh/WP_SECRET"
+          
+          echo "5. Проверка валидности ключа:"
+          if ssh-keygen -l -f "$HOME/.ssh/WP_SECRET" &>/dev/null; then
+            echo "✅ Ключ валидный!"
+          else
+            echo "❌ Ключ НЕ валидный! Возможные причины:"
+            echo "   - В секрете не полный ключ (нет BEGIN/END строк)"
+            echo "   - Ключ в неправильном формате"
+            echo "   - Есть лишние пробелы или переносы"
+          fi
+          echo "=========================="
+      
+      # Добавляем сервер в known_hosts
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan -p 22 179.43.144.107 >> "$HOME/.ssh/known_hosts"
+      
       # Deploy
-      - run: rsync -e "ssh -p 22 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
+      - name: Deploy via rsync
+        run: |
+          rsync -avz --delete \
+            -e "ssh -p 22 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'node_modules' \
+            --exclude '.env' \
+            ./ \
+            adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru/
