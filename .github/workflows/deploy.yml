@@ -46,7 +46,7 @@ jobs:
           fi
           echo "=========================="
       
-      # Добавляем сервер в known_hosts
+      # Добавляем сервер в known_hosts 
       - name: Add server to known_hosts
         run: |
           ssh-keyscan -p 22 179.43.144.107 >> "$HOME/.ssh/known_hosts"
