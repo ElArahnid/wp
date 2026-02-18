@@ -1,4 +1,4 @@
-name: Deploy
+name: Test SSH Key
 
 on:
   push:
@@ -6,17 +6,29 @@ on:
       - main
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      # Setup key
-      - run: set -eu
-      - run: mkdir "$HOME/.ssh"
-      - run: echo "${{ secrets.WP_SECRET }}" > "$HOME/.ssh/WP_SECRET"
-      - run: chmod 600 "$HOME/.ssh/WP_SECRET"
-      # Build
-      # - run: npm ci
-      # - run: npm run build
-      # Deploy
-      - run: rsync -e "ssh -p 22 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
+      - name: Test SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.WP_SECRET }}
+        run: |
+          # Показать первые 50 символов секрета (для проверки формата)
+          echo "Первые 50 символов секрета:"
+          echo "$SSH_PRIVATE_KEY" | head -c 50
+          echo ""
+          
+          # Сохранить ключ
+          echo "$SSH_PRIVATE_KEY" > test_key
+          
+          # Проверить количество строк
+          echo "Количество строк в ключе:"
+          wc -l test_key
+          
+          # Проверить формат
+          echo "Первая строка:"
+          head -n 1 test_key
+          
+          # Попробовать прочитать ключ
+          echo "Попытка прочитать ключ:"
+          ssh-keygen -y -f test_key || echo "Не удалось прочитать ключ"
