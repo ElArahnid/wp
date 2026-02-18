@@ -13,10 +13,10 @@ jobs:
       # Setup key
       - run: set -eu
       - run: mkdir "$HOME/.ssh"
-      - run: echo "${{ secrets.GITHUB_TOKEN }}" > "$HOME/.ssh/wp-adzhna"
-      - run: chmod 600 "$HOME/.ssh/wp-adzhna"
+      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/WP_SECRET"
+      - run: chmod 600 "$HOME/.ssh/WP_SECRET"
       # Build
       # - run: npm ci
       # - run: npm run build
       # Deploy
-      - run: rsync -e "ssh -p 22 -i $HOME/.ssh/wp-adzhna -o StrictHostKeyChecking=no" --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
+      - run: rsync -e "ssh -p 22 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
