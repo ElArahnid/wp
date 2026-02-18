@@ -15,6 +15,7 @@ jobs:
       - run: mkdir "$HOME/.ssh"
       - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/WP_SECRET"
       - run: chmod 600 "$HOME/.ssh/WP_SECRET"
+      
       # Build
       # - run: npm ci
       # - run: npm run build
