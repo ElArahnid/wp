@@ -9,41 +9,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup SSH key
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          set -eu
-          mkdir -p "$HOME/.ssh"
-          
-          # Сохраняем ключ, удаляя возможные лишние символы
-          echo "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_rsa"
-          chmod 600 "$HOME/.ssh/id_rsa"
-          
-          # Проверяем ключ
-          echo "Ключ сохранен. Проверка формата:"
-          head -n 1 "$HOME/.ssh/id_rsa"
-          
-          # Тестируем ключ
-          if ssh-keygen -y -f "$HOME/.ssh/id_rsa" &>/dev/null; then
-            echo "✅ Ключ валидный"
-          else
-            echo "❌ Ключ НЕ валидный"
-            exit 1
-          fi
-      
-      - name: Add server to known_hosts
-        run: |
-          ssh-keyscan -p 22 179.43.144.107 >> "$HOME/.ssh/known_hosts"
-      
-      - name: Deploy
-        run: |
-          rsync -avz --delete \
-            -e "ssh -p 22 -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no" \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'node_modules' \
-            ./ \
-            adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru/
+      - uses: actions/checkout@v2
+      # Setup key
+      - run: set -eu
+      - run: mkdir "$HOME/.ssh"
+      - run: echo "${{ secrets.WP_SECRET }}" > "$HOME/.ssh/WP_SECRET"
+      - run: chmod 600 "$HOME/.ssh/WP_SECRET"
+      # Build
+      # - run: npm ci
+      # - run: npm run build
+      # Deploy
+      - run: rsync -e "ssh -p 22 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
