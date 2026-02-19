@@ -9,34 +9,26 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # 1️⃣ Забираем код
       - uses: actions/checkout@v2
 
-      # 2️⃣ Настраиваем SSH ключ через ssh-agent
       - run: |
-          # Устанавливаем ssh-client если нет
           command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )
 
-          # Запускаем ssh-agent
           eval $(ssh-agent -s)
 
-          # Добавляем приватный ключ из GitHub Secret
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
 
-          # Создаём .ssh и known_hosts
           mkdir -p ~/.ssh
           touch ~/.ssh/config
           touch ~/.ssh/known_hosts
           chmod 400 ~/.ssh/*
 
-          # Добавляем сервер в known_hosts
           ssh-keyscan -p 22 179.43.144.107 >> ~/.ssh/known_hosts
 
       # 3️⃣ (Опционально) сборка проекта
       # - run: npm ci
       # - run: npm run build
 
-      # 4️⃣ Деплой через rsync через SSH
       - run: |
           rsync -e "ssh -p 22 -o StrictHostKeyChecking=no" \
           --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
