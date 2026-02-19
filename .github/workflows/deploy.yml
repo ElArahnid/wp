@@ -20,7 +20,7 @@ jobs:
           # Запускаем ssh-agent
           eval $(ssh-agent -s)
 
-          # Добавляем приватный ключ из GitHub Secret, удаляя лишние \r
+          # Добавляем приватный ключ из GitHub Secret
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
 
           # Создаём .ssh и known_hosts
