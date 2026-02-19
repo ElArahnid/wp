@@ -10,23 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-            
-      # Diagnostic step
-      - name: Debug SSH key
-        env:
-          WP_SECRET: ${{ secrets.WP_SECRET }}
-        run: |
-            echo "=== KEY CHECK ==="
-            file $HOME/.ssh/WP_SECRET
-            wc -l $HOME/.ssh/WP_SECRET
-            head -n 1 $HOME/.ssh/WP_SECRET
-            tail -n 1 $HOME/.ssh/WP_SECRET
-            ssh-keygen -l -f $HOME/.ssh/WP_SECRET || echo "KEY INVALID"
-            echo "================="
       # Setup key
       - run: set -eu
-      - run: mkdir -p "$HOME/.ssh"
-      - run: echo "${{ secrets.WP_SECRET }}" > "$HOME/.ssh/WP_SECRET"
+      - run: mkdir "$HOME/.ssh"
+      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/WP_SECRET"
       - run: chmod 600 "$HOME/.ssh/WP_SECRET"
       # Build
       # - run: npm ci
