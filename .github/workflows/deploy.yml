@@ -26,7 +26,6 @@ jobs:
           echo "Number of lines:"
           echo "$WP_SECRET" | wc -l
           echo "==================="
-      
       # Setup key
       - run: set -eu
       - run: mkdir "$HOME/.ssh"
