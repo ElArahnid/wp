@@ -11,10 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       # Setup key
-      - run: set -eu
-      - run: mkdir "$HOME/.ssh"
-      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/WP_SECRET"
-      - run: chmod 600 "$HOME/.ssh/WP_SECRET"
+      - run: |
+            set -eu
+            mkdir -p $HOME/.ssh
+            printf "%s" "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/WP_SECRET
+            chmod 600 $HOME/.ssh/WP_SECRET
       # Build
       # - run: npm ci
       # - run: npm run build
