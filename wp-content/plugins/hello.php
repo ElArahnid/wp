@@ -20,33 +20,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function hello_dolly_get_lyric() {
 	/** These are the lyrics to Hello Dolly */
-	$lyrics = "------------------Hello, Dolly
-Well, hello, Dolly
-It's so nice to have you back where you belong
-You're lookin' swell, Dolly
-I can tell, Dolly
-You're still glowin', you're still crowin'
-You're still goin' strong
-I feel the room swayin'
-While the band's playin'
-One of our old favorite songs from way back when
-So, take her wrap, fellas
-Dolly, never go away again
-Hello, Dolly
-Well, hello, Dolly
-It's so nice to have you back where you belong
-You're lookin' swell, Dolly
-I can tell, Dolly
-You're still glowin', you're still crowin'
-You're still goin' strong
-I feel the room swayin'
-While the band's playin'
-One of our old favorite songs from way back when
-So, golly, gee, fellas
-Have a little faith in me, fellas
-Dolly, never go away
-Promise, you'll never go away
-Dolly'll never go away again";
+	$lyrics = "Я сказал здравствуй, Долли...
+Это Луи, Долли
+Как прекрасно встретить тебя там,
+где тебе всегда рады
+Ты выглядишь шикарно, Долли...
+говорю тебе, Долли
+Ты просто светишься, все еще впечатлительна,
+ты повзрослела
+Кажется, эта комната плывет в моих глазах...
+когда музыканты играют
+Одну из наших любимых песен
+из далёкого прошлого, когда...
+Вот ...я возьму ее шаль, парни...
+Возьму на колени, парни
+Долли никогда больше не покинет меня
+Кажется, эта комната плывет в моих глазах...
+когда музыканты играют
+Одну из наших любимых песен
+из далёкого прошлого, когда...
+Так что, черт возьми, парни,
+Уж поверьте мне, парни
+Долли никогда больше не покинет меня
+Сказал, никогда больше не покинет меня
+Долли никогда больше не покинет меня";
 
 	// Here we split it into lines.
 	$lyrics = explode( "\n", $lyrics );
