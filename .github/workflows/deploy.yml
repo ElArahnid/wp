@@ -26,9 +26,10 @@ jobs:
           echo "Number of lines:"
           echo "$WP_SECRET" | wc -l
           echo "==================="
+
       # Setup key
       - run: set -eu
-      - run: mkdir "$HOME/.ssh"
+      - run: mkdir -p "$HOME/.ssh"
       - run: echo "${{ secrets.WP_SECRET }}" > "$HOME/.ssh/WP_SECRET"
       - run: chmod 600 "$HOME/.ssh/WP_SECRET"
       # Build
