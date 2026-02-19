@@ -17,15 +17,13 @@ jobs:
         env:
           WP_SECRET: ${{ secrets.WP_SECRET }}
         run: |
-          echo "=== SSH KEY DEBUG ==="
-          echo "Secret length: ${#WP_SECRET} characters"
-          echo "First line:"
-          echo "$WP_SECRET" | head -n 1
-          echo "Last line:"
-          echo "$WP_SECRET" | tail -n 1
-          echo "Number of lines:"
-          echo "$WP_SECRET" | wc -l
-          echo "==================="
+            echo "=== KEY CHECK ==="
+            file $HOME/.ssh/WP_SECRET
+            wc -l $HOME/.ssh/WP_SECRET
+            head -n 1 $HOME/.ssh/WP_SECRET
+            tail -n 1 $HOME/.ssh/WP_SECRET
+            ssh-keygen -l -f $HOME/.ssh/WP_SECRET || echo "KEY INVALID"
+            echo "================="
       # Setup key
       - run: set -eu
       - run: mkdir -p "$HOME/.ssh"
