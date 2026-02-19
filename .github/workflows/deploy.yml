@@ -9,15 +9,21 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # 1️⃣ Забираем код
       - uses: actions/checkout@v2
+
+      # 2️⃣ Настраиваем SSH ключ безопасно
       - run: |
           mkdir -p $HOME/.ssh
-          cat << 'EOF' > $HOME/.ssh/WP_SECRET
-          ${{ secrets.SSH_PRIVATE_KEY }}
-          EOF
+          printf "%s" "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/WP_SECRET
           chmod 600 $HOME/.ssh/WP_SECRET
-      # Build
+          ssh-keyscan -p 22 179.43.144.107 >> $HOME/.ssh/known_hosts
+
+      # 3️⃣ (Опционально) сборка проекта
       # - run: npm ci
       # - run: npm run build
-      # Deploy
-      - run: rsync -e "ssh -p 22 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
+
+      # 4️⃣ Деплой через rsync
+      - run: |
+          rsync -e "ssh -p 22 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" \
+          --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
