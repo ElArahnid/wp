@@ -10,25 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - run: |
-          command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )
-
-          eval $(ssh-agent -s)
-
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
-
-          mkdir -p ~/.ssh
-          touch ~/.ssh/config
-          touch ~/.ssh/known_hosts
-          chmod 400 ~/.ssh/*
-
-          ssh-keyscan -p 22 179.43.144.107 >> ~/.ssh/known_hosts
-
-      # 3️⃣ (Опционально) сборка проекта
+      # Setup key
+      - run: set -eu
+      - run: mkdir "$HOME/.ssh"
+      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/WP_SECRET"
+      - run: chmod 600 "$HOME/.ssh/WP_SECRET"
+      # Build
       # - run: npm ci
       # - run: npm run build
-
-      - run: |
-          rsync -e "ssh -p 22 -o StrictHostKeyChecking=no" \
-          --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
+      # Deploy
+      - run: rsync -e "ssh -p 22 -i $HOME/.ssh/WP_SECRET -o StrictHostKeyChecking=no" --archive --compress --delete . adzhna@179.43.144.107:/var/www/adzhna/data/www/wp.adzhna.ru
